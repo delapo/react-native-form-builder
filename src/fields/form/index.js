@@ -1,58 +1,61 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { View, Text } from 'native-base';
-import GenerateForm from '../../formBuilder';
+import { View, Item, Input, Icon, ListItem, Text } from 'native-base';
+import { Platform } from 'react-native';
+import { getKeyboardType } from '../../utils/methods';
 
-export default class FormField extends Component {
+export default class TextInputField extends Component {
   static propTypes = {
     attributes: PropTypes.object,
     theme: PropTypes.object,
     updateValue: PropTypes.func,
-    autoValidation: PropTypes.bool,
-    customValidation: PropTypes.func,
-    customComponents: PropTypes.object,
-  }
-  constructor(props) {
-    super(props);
-    this.onValueChange = this.onValueChange.bind(this);
-  }
-  componentDidMount() {
-    this.props.updateValue(this.props.attributes.name, this.group.getValues());
-  }
-  onValueChange() {
-    this.props.updateValue(this.props.attributes.name, this.group.getValues());
+    onSummitTextInput: PropTypes.func,
+    ErrorComponent: PropTypes.func,
   }
   handleChange(text) {
-    this.setState({
-      value: text,
-    }, () => this.props.updateValue(this.props.attributes.name, text));
+    this.props.updateValue(this.props.attributes.name, text);
   }
   render() {
-    const {
-      attributes,
-      theme,
-      autoValidation,
-      customValidation,
-      customComponents,
-    } = this.props;
+    const { theme, attributes, ErrorComponent } = this.props;
+    const inputProps = attributes.props;
+    const keyboardType = getKeyboardType(attributes.type);
+    const magic = this.props.attributes.color || 'black';
+
     return (
-      <View>
-        <View style={{ paddingHorizontal: 15, paddingVertical: 5 }}>
-          <Text style={{ fontWeight: '500', fontSize: 17 }}>{attributes.label}</Text>
+      <ListItem style={{ borderBottomWidth: 0, paddingVertical: 5 }}>
+        <View style={{ flex: 1 }}>
+          <View>
+            <Item error={theme.changeTextInputColorOnError ? attributes.error : null}>
+              { attributes.icon &&
+              <Icon color={theme.textInputIconColor} name={attributes.icon} />
+                }
+              <Input
+                style={{
+                  height: inputProps && inputProps.multiline && (Platform.OS === 'ios' ? undefined : null),
+                  padding: 0,
+                }}
+                ref={(c) => { this.textInput = c; }}
+                underlineColorAndroid="transparent"
+                numberOfLines={3}
+                secureTextEntry={attributes.secureTextEntry || attributes.type === 'password'}
+                placeholder={attributes.label}
+                blurOnSubmit={false}
+                onSubmitEditing={() => this.props.onSummitTextInput(this.props.attributes.name)}
+                placeholderTextColor={theme.inputColorPlaceholder}
+                editable={attributes.editable}
+                style={{ color: magic }}
+                value={attributes.value && attributes.value.toString()}
+                keyboardType={keyboardType}
+                onChangeText={text => this.handleChange(text)}
+                {...inputProps}
+              />
+              { theme.textInputErrorIcon && attributes.error ?
+                <Icon name={theme.textInputErrorIcon} /> : null}
+            </Item>
+          </View>
+          <ErrorComponent {...{ attributes, theme }} />
         </View>
-        <View style={{ paddingHorizontal: 10 }}>
-          <GenerateForm
-            ref={(c) => { this.group = c; }}
-            onValueChange={this.onValueChange}
-            autoValidation={autoValidation}
-            customValidation={customValidation}
-            customComponents={customComponents}
-            showErrors
-            fields={attributes.fields}
-            theme={theme}
-          />
-        </View>
-      </View>
+      </ListItem>
     );
   }
 }
