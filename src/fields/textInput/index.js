@@ -19,6 +19,8 @@ export default class TextInputField extends Component {
     const { theme, attributes, ErrorComponent } = this.props;
     const inputProps = attributes.props;
     const keyboardType = getKeyboardType(attributes.type);
+    const magic = this.props.attributes.color || '#ADADAD';
+
     return (
       <ListItem style={{ borderBottomWidth: 0, paddingVertical: 5 }}>
         <View style={{ flex: 1 }}>
@@ -41,6 +43,7 @@ export default class TextInputField extends Component {
                 onSubmitEditing={() => this.props.onSummitTextInput(this.props.attributes.name)}
                 placeholderTextColor={theme.inputColorPlaceholder}
                 editable={attributes.editable}
+                style={{ color: magic }}
                 value={attributes.value && attributes.value.toString()}
                 keyboardType={keyboardType}
                 onChangeText={text => this.handleChange(text)}
