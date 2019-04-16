@@ -19,7 +19,7 @@ export default class TextInputField extends Component {
     const { theme, attributes, ErrorComponent } = this.props;
     const inputProps = attributes.props;
     const keyboardType = getKeyboardType(attributes.type);
-    const magic = this.props.attributes.color || '#f2f2f2';
+    const magic = this.props.attributes.color || '#cccccc';
 
     return (
       <ListItem style={{ borderBottomWidth: 0, paddingVertical: 5 }}>
